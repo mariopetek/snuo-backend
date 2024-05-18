@@ -190,4 +190,18 @@ export class ItemController {
             return next(error)
         }
     }
+    async getMainAndAppetizers(
+        req: Request<Params>,
+        res: Response,
+        next: NextFunction,
+    ) {
+        try {
+            const mainAndAppetizers = await itemService.getMainAndAppetizers(
+                req.params.restaurantId,
+            )
+            return res.json(mainAndAppetizers)
+        } catch (error) {
+            return next(error)
+        }
+    }
 }
