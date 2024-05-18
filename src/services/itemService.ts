@@ -119,12 +119,20 @@ export class ItemService {
         const restaurantSauces = restaurantSaucesResults.rows as Item[]
         return restaurantSauces
     }
-    async getMainAndAppetizers(restaurantId: string) {
+    async getRestaurantMainAndAppetizers(restaurantId: string) {
         const mainAndAppetizersResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija IN ($2, $3)',
             [restaurantId, 'GLAVNA_JELA', 'PREDJELA'],
         )
         const mainAndAppetizers = mainAndAppetizersResults.rows as Item[]
         return mainAndAppetizers
+    }
+    async getRestaurantSideDishesAndSauces(restaurantId: string) {
+        const sideDishesAndSaucesResults = await db.query(
+            'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija IN ($2, $3)',
+            [restaurantId, 'PRILOZI', 'UMACI'],
+        )
+        const sideDishesAndSauces = sideDishesAndSaucesResults.rows as Item[]
+        return sideDishesAndSauces
     }
 }

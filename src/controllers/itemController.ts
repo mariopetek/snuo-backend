@@ -190,16 +190,30 @@ export class ItemController {
             return next(error)
         }
     }
-    async getMainAndAppetizers(
+    async getRestaurantMainAndAppetizers(
         req: Request<Params>,
         res: Response,
         next: NextFunction,
     ) {
         try {
-            const mainAndAppetizers = await itemService.getMainAndAppetizers(
+            const mainAndAppetizers = await itemService.getRestaurantMainAndAppetizers(
                 req.params.restaurantId,
             )
             return res.json(mainAndAppetizers)
+        } catch (error) {
+            return next(error)
+        }
+    }
+    async getRestaurantSideDishesAndSauces(
+        req: Request<Params>,
+        res: Response,
+        next: NextFunction,) {
+        try {
+            const sideDishesAndSauces =
+                await itemService.getRestaurantSideDishesAndSauces(
+                    req.params.restaurantId,
+                )
+            return res.json(sideDishesAndSauces)
         } catch (error) {
             return next(error)
         }

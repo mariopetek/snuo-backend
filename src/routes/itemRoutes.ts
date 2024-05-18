@@ -29,5 +29,6 @@ itemRouter.get(
     itemController.getRestaurantSideDishes,
 )
 itemRouter.get('/:restaurantId/sauces', itemController.getRestaurantSauces)
-itemRouter.get('/:restaurantId/main-and-appetizers', itemController.getMainAndAppetizers)
+itemRouter.get('/:restaurantId/main-and-appetizers', itemController.getRestaurantMainAndAppetizers)
+itemRouter.get('/:restaurantId/side-dishes-and-sauces', itemController.getRestaurantSideDishesAndSauces)
 export { itemRouter }
