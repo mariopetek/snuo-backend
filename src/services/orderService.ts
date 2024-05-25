@@ -15,8 +15,6 @@ export class OrderService {
         )
         const order = orderResults.rows[0] as Order
 
-        console.log(order)
-
         const orderItemsResults = await db.query(
             'SELECT stavka.id_stavka, naziv_stavka, kolicina, cijena FROM stavka NATURAL JOIN narudzba_stavka WHERE id_narudzba = $1',
             [order.id_narudzba],
@@ -24,8 +22,6 @@ export class OrderService {
         const orderItems = orderItemsResults.rows as (Item & {
             kolicina: number
         })[]
-
-        console.log(orderItems)
 
         return {
             ...order,
