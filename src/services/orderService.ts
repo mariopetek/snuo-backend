@@ -14,7 +14,24 @@ export class OrderService {
             [orderId, restaurantId],
         )
         const order = orderResults.rows[0] as Order
-        return order
+
+        console.log(order)
+
+        const orderItemsResults = await db.query(
+            'SELECT stavka.id_stavka, naziv_stavka, kolicina, cijena FROM stavka NATURAL JOIN narudzba_stavka WHERE id_narudzba = $1',
+            [order.id_narudzba],
+        )
+        const orderItems = orderItemsResults.rows as (Item & {
+            kolicina: number
+        })[]
+
+        console.log(orderItems)
+
+        return {
+            ...order,
+            stavke: orderItems,
+            ukupna_cijena: this.calculateTotalPrice(orderItems),
+        }
     }
 
     private async validate(order: OrderDTO, restaurantId: string) {
@@ -134,29 +151,16 @@ export class OrderService {
 
             const createdOrder = orderResults.rows[0] as Order
 
-            const orderId = createdOrder.id_narudzba
-
             for (const item of order.items) {
                 await client.query(
-                    'INSERT INTO narudzba_stavka (id_stavka, id_narudzba, kolicina) VALUES ($1, $2, $3)',
-                    [item.id_stavka, orderId, item.kolicina],
+                    'INSERT INTO narudzba_stavka (id_narudzba, id_stavka, kolicina) VALUES ($1, $2, $3)',
+                    [createdOrder.id_narudzba, item.id_stavka, item.kolicina],
                 )
             }
-            await client.query('COMMIT')
 
-            const orderItemsResults = await client.query(
-                'SELECT stavka.id_stavka, naziv_stavka, kolicina, cijena FROM stavka NATURAL JOIN narudzba_stavka WHERE id_narudzba = $1',
-                [orderId],
-            )
-            const orderItems = orderItemsResults.rows as (Item & {
-                kolicina: number
-            })[]
+            const orderId = createdOrder.id_narudzba
 
-            return {
-                ...createdOrder,
-                stavke: orderItems,
-                ukupna_cijena: this.calculateTotalPrice(orderItems),
-            }
+            return orderId
         } catch (error) {
             await client.query('ROLLBACK')
             throw error
