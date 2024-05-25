@@ -11,4 +11,4 @@ const pool = new Pool({
 export const query = (text: string, params?: string[]) => {
     return pool.query(text, params)
 }
-export { pool }; 
+export { pool }
