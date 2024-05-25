@@ -1,4 +1,4 @@
-export enum Kategorija {
+export enum Category {
     'TOPLI_NAPITCI',
     'BEZALKOHOLNA_PICA',
     'VINA',

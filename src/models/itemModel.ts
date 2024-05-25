@@ -1,17 +1,17 @@
-import { Kategorija } from './categoryModel'
+import { Category } from './categoryModel'
 
 export class Item {
     id_stavka: string
     naziv_stavka: string
     cijena: number
-    kategorija: Kategorija
+    kategorija: Category
     id_objekt: string
 
     constructor(
         id_stavka: string,
         naziv_stavka: string,
         cijena: number,
-        kategorija: Kategorija,
+        kategorija: Category,
         id_objekt: string,
     ) {
         this.id_stavka = id_stavka

@@ -8,87 +8,6 @@ type Params = {
 }
 
 export class ItemController {
-    async getAllItems(req: Request<Params>, res: Response, next: NextFunction) {
-        try {
-            const allItems = await itemService.getAllItems()
-            return res.json(allItems)
-        } catch (error) {
-            return next(error)
-        }
-    }
-    async getAllDrinks(
-        req: Request<Params>,
-        res: Response,
-        next: NextFunction,
-    ) {
-        try {
-            const allDrinks = await itemService.getAllDrinks()
-            return res.json(allDrinks)
-        } catch (error) {
-            return next(error)
-        }
-    }
-    async getAllAppetizers(
-        req: Request<Params>,
-        res: Response,
-        next: NextFunction,
-    ) {
-        try {
-            const allAppetizers = await itemService.getAllAppetizers()
-            return res.json(allAppetizers)
-        } catch (error) {
-            return next(error)
-        }
-    }
-    async getAllMainDishes(
-        req: Request<Params>,
-        res: Response,
-        next: NextFunction,
-    ) {
-        try {
-            const allMainDishes = await itemService.getAllMainDishes()
-            return res.json(allMainDishes)
-        } catch (error) {
-            return next(error)
-        }
-    }
-    async getAllDesserts(
-        req: Request<Params>,
-        res: Response,
-        next: NextFunction,
-    ) {
-        try {
-            const allDesserts = await itemService.getAllDesserts()
-            return res.json(allDesserts)
-        } catch (error) {
-            return next(error)
-        }
-    }
-    async getAllSideDishes(
-        req: Request<Params>,
-        res: Response,
-        next: NextFunction,
-    ) {
-        try {
-            const allSideDishes = await itemService.getAllSideDishes()
-            return res.json(allSideDishes)
-        } catch (error) {
-            return next(error)
-        }
-    }
-    async getAllSauces(
-        req: Request<Params>,
-        res: Response,
-        next: NextFunction,
-    ) {
-        try {
-            const allSauces = await itemService.getAllSauces()
-            return res.json(allSauces)
-        } catch (error) {
-            return next(error)
-        }
-    }
-
     async getRestaurantItems(
         req: Request<Params>,
         res: Response,
@@ -196,9 +115,10 @@ export class ItemController {
         next: NextFunction,
     ) {
         try {
-            const mainAndAppetizers = await itemService.getRestaurantMainAndAppetizers(
-                req.params.restaurantId,
-            )
+            const mainAndAppetizers =
+                await itemService.getRestaurantMainAndAppetizers(
+                    req.params.restaurantId,
+                )
             return res.json(mainAndAppetizers)
         } catch (error) {
             return next(error)
@@ -207,7 +127,8 @@ export class ItemController {
     async getRestaurantSideDishesAndSauces(
         req: Request<Params>,
         res: Response,
-        next: NextFunction,) {
+        next: NextFunction,
+    ) {
         try {
             const sideDishesAndSauces =
                 await itemService.getRestaurantSideDishesAndSauces(

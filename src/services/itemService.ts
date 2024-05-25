@@ -1,61 +1,8 @@
 import { Item } from '../models/itemModel'
 import * as db from '../config/database'
+import { Category } from '../models/categoryModel'
 
 export class ItemService {
-    async getAllItems() {
-        const itemsResults = await db.query('SELECT * FROM stavka')
-        const items = itemsResults.rows as Item[]
-        return items
-    }
-    async getAllDrinks() {
-        const drinksResults = await db.query(
-            'SELECT * FROM stavka WHERE kategorija IN ($1, $2, $3, $4, $5)',
-            ['TOPLI_NAPITCI', 'BEZALKOHOLNA_PICA', 'VINA', 'PIVA', 'KOKTELI'],
-        )
-        const drinks = drinksResults.rows as Item[]
-        return drinks
-    }
-    async getAllAppetizers() {
-        const appetizersResults = await db.query(
-            'SELECT * FROM stavka WHERE kategorija = $1',
-            ['PREDJELA'],
-        )
-        const appetizers = appetizersResults.rows as Item[]
-        return appetizers
-    }
-    async getAllMainDishes() {
-        const mainDishesResults = await db.query(
-            'SELECT * FROM stavka WHERE kategorija = $1',
-            ['GLAVNA_JELA'],
-        )
-        const mainDishes = mainDishesResults.rows as Item[]
-        return mainDishes
-    }
-    async getAllDesserts() {
-        const dessertsResults = await db.query(
-            'SELECT * FROM stavka WHERE kategorija = $1',
-            ['DESERTI'],
-        )
-        const desserts = dessertsResults.rows as Item[]
-        return desserts
-    }
-    async getAllSideDishes() {
-        const sideDishesResults = await db.query(
-            'SELECT * FROM stavka WHERE kategorija = $1',
-            ['PRILOZI'],
-        )
-        const sideDishes = sideDishesResults.rows as Item[]
-        return sideDishes
-    }
-    async getAllSauces() {
-        const saucesResults = await db.query(
-            'SELECT * FROM stavka WHERE kategorija = $1',
-            ['UMACI'],
-        )
-        const sauces = saucesResults.rows as Item[]
-        return sauces
-    }
-
     async getRestaurantItems(restaurantId: string) {
         const restaurantItemsResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1',
@@ -69,11 +16,11 @@ export class ItemService {
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija IN ($2, $3, $4, $5, $6)',
             [
                 restaurantId,
-                'TOPLI_NAPITCI',
-                'BEZALKOHOLNA_PICA',
-                'VINA',
-                'PIVA',
-                'KOKTELI',
+                Category[Category.TOPLI_NAPITCI],
+                Category[Category.BEZALKOHOLNA_PICA],
+                Category[Category.VINA],
+                Category[Category.PIVA],
+                Category[Category.KOKTELI],
             ],
         )
         const restaurantDrinks = restaurantDrinksResults.rows as Item[]
@@ -82,7 +29,7 @@ export class ItemService {
     async getRestaurantAppetizers(restaurantId: string) {
         const restaurantAppetizersResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija = $2',
-            [restaurantId, 'PREDJELA'],
+            [restaurantId, Category[Category.PREDJELA]],
         )
         const restaurantAppetizers = restaurantAppetizersResults.rows as Item[]
         return restaurantAppetizers
@@ -90,7 +37,7 @@ export class ItemService {
     async getRestaurantMainDishes(restaurantId: string) {
         const restaurantMainDishesResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija = $2',
-            [restaurantId, 'GLAVNA_JELA'],
+            [restaurantId, Category[Category.GLAVNA_JELA]],
         )
         const restaurantMainDishes = restaurantMainDishesResults.rows as Item[]
         return restaurantMainDishes
@@ -98,7 +45,7 @@ export class ItemService {
     async getRestaurantDesserts(restaurantId: string) {
         const restaurantDessertsResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija = $2',
-            [restaurantId, 'DESERTI'],
+            [restaurantId, Category[Category.DESERTI]],
         )
         const restaurantDesserts = restaurantDessertsResults.rows as Item[]
         return restaurantDesserts
@@ -106,7 +53,7 @@ export class ItemService {
     async getRestaurantSideDishes(restaurantId: string) {
         const restaurantSideDishesResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija = $2',
-            [restaurantId, 'PRILOZI'],
+            [restaurantId, Category[Category.PRILOZI]],
         )
         const restaurantSideDishes = restaurantSideDishesResults.rows as Item[]
         return restaurantSideDishes
@@ -114,7 +61,7 @@ export class ItemService {
     async getRestaurantSauces(restaurantId: string) {
         const restaurantSaucesResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija = $2',
-            [restaurantId, 'UMACI'],
+            [restaurantId, Category[Category.UMACI]],
         )
         const restaurantSauces = restaurantSaucesResults.rows as Item[]
         return restaurantSauces
@@ -122,7 +69,11 @@ export class ItemService {
     async getRestaurantMainAndAppetizers(restaurantId: string) {
         const mainAndAppetizersResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija IN ($2, $3)',
-            [restaurantId, 'GLAVNA_JELA', 'PREDJELA'],
+            [
+                restaurantId,
+                Category[Category.PREDJELA],
+                Category[Category.GLAVNA_JELA],
+            ],
         )
         const mainAndAppetizers = mainAndAppetizersResults.rows as Item[]
         return mainAndAppetizers
@@ -130,7 +81,11 @@ export class ItemService {
     async getRestaurantSideDishesAndSauces(restaurantId: string) {
         const sideDishesAndSaucesResults = await db.query(
             'SELECT * FROM stavka WHERE id_objekt = $1 AND kategorija IN ($2, $3)',
-            [restaurantId, 'PRILOZI', 'UMACI'],
+            [
+                restaurantId,
+                Category[Category.PRILOZI],
+                Category[Category.UMACI],
+            ],
         )
         const sideDishesAndSauces = sideDishesAndSaucesResults.rows as Item[]
         return sideDishesAndSauces
