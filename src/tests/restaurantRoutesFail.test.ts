@@ -16,7 +16,7 @@ afterAll((done) => {
 })
 
 describe('GET /api/restaurants/123', () => {
-    it('should return 400', async () => {
+    it('should return 400 Bad Request with a message', async () => {
         const response = await request(app).get('/api/restaurants/123')
         expect(response.status).toBe(400)
         expect(response.body).toStrictEqual({ message: 'Bad Request' })

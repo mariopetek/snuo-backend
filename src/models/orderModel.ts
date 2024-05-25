@@ -30,12 +30,10 @@ type OrderItem = Pick<Item, 'id_stavka'> & { kolicina: number }
 
 export class OrderDTO {
     br_stol: number
-    id_konobar: string
     items: OrderItem[]
 
-    constructor(br_stol: number, id_konobar: string, items: OrderItem[]) {
+    constructor(br_stol: number, items: OrderItem[]) {
         this.br_stol = br_stol
-        this.id_konobar = id_konobar
         this.items = items
     }
 }

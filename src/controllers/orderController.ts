@@ -54,6 +54,23 @@ export class OrderController {
         }
     }
 
+    async getRestaurantOrderById(
+        req: Request<Params>,
+        res: Response,
+        next: NextFunction,
+    ) {
+        try {
+            const { restaurantId, orderId } = req.params
+            const order = await orderService.getRestaurantOrderById(
+                restaurantId,
+                orderId,
+            )
+            return res.json(order)
+        } catch (error) {
+            return next(error)
+        }
+    }
+
     async createOrder(req: Request<Params>, res: Response, next: NextFunction) {
         try {
             const order = req.body

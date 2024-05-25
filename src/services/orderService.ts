@@ -3,8 +3,19 @@ import * as db from '../config/database'
 import { Status } from '../models/statusModel'
 import { ValidationError } from '../errors/ValidationError'
 import { validate as isValidUUID } from 'uuid'
+import { Shift } from '../models/shiftModel'
+import { Waiter } from '../models/waiterModel'
 
 export class OrderService {
+    async getRestaurantOrderById(restaurantId: string, orderId: string) {
+        const orderResults = await db.query(
+            'SELECT * FROM narudzba WHERE id_narudzba = $1 AND id_objekt = $2',
+            [orderId, restaurantId],
+        )
+        const order = orderResults.rows[0] as Order
+        return order
+    }
+
     private async validate(order: OrderDTO, restaurantId: string) {
         if (order.br_stol === undefined || order.br_stol === null) {
             throw new ValidationError('br_stol is required')
@@ -20,23 +31,6 @@ export class OrderService {
         if (tableCount === 0) {
             throw new ValidationError(
                 'br_stol is not a valid table in this restaurant',
-            )
-        }
-
-        if (order.id_konobar === undefined || order.id_konobar === null) {
-            throw new ValidationError('id_konobar is required')
-        }
-        if (!isValidUUID(order.id_konobar)) {
-            throw new ValidationError('id_konobar must be a valid UUID')
-        }
-        const waiterResults = await db.query(
-            'SELECT COUNT(*) FROM zaposlenik, konobar WHERE id_zaposlenik = id_konobar AND id_konobar = $1 AND id_objekt=$2',
-            [order.id_konobar, restaurantId],
-        )
-        const waiterCount = parseInt(waiterResults.rows[0].count)
-        if (waiterCount === 0) {
-            throw new ValidationError(
-                'id_konobar is not a valid waiter in this restaurant',
             )
         }
 
@@ -78,6 +72,28 @@ export class OrderService {
         }
     }
 
+    private getCurrentShift() {
+        const shift = new Date().getHours()
+        if (shift >= 6 && shift < 14) {
+            return Shift[Shift.JUTARNJA]
+        } else if (shift >= 14 && shift < 22) {
+            return Shift[Shift.POPODNEVNA]
+        } else {
+            return Shift[Shift.NOCNA]
+        }
+    }
+
+    private async getRandomWaiterByShift(restaurantId: string) {
+        const currentShift = this.getCurrentShift()
+        const waitersResults = await db.query(
+            'SELECT id_zaposlenik FROM zaposlenik, konobar WHERE id_zaposlenik = id_konobar AND id_objekt = $1 AND smjena = $2',
+            [restaurantId, currentShift],
+        )
+        const waiters = waitersResults.rows as Waiter[]
+        const randomIndex = Math.floor(Math.random() * waiters.length)
+        return waiters[randomIndex]
+    }
+
     async createOrder(restaurantId: string, order: OrderDTO) {
         await this.validate(order, restaurantId)
 
@@ -92,14 +108,16 @@ export class OrderService {
             const time = new Date(berlinTime)
             const status = Status[Status.KREIRANA]
 
+            const waiter = await this.getRandomWaiterByShift(restaurantId)
+
             const orderResults = await client.query(
-                'INSERT INTO narudzba (vrijeme, status, br_stol, id_objekt, id_konobar) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                'INSERT INTO narudzba (vrijeme, status, br_stol, id_objekt, id_konobar) VALUES ($1, $2, $3, $4, $5) RETURNING id_narudzba',
                 [
                     time.toISOString(),
                     status,
                     order.br_stol,
                     restaurantId,
-                    order.id_konobar,
+                    waiter.id_zaposlenik,
                 ],
             )
 
