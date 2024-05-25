@@ -5,6 +5,7 @@ import { restaurantRouter } from './routes/restaurantRoutes'
 import { errorHandler } from './middleware/errorHandler'
 import { orderRouter } from './routes/orderRoutes'
 import { employeeRouter } from './routes/employeeRoutes'
+import { tableRouter } from './routes/tableRoutes'
 
 dotenv.config()
 const app = express()
@@ -20,6 +21,7 @@ app.use('/api/items', itemRouter)
 app.use('/api/restaurants', restaurantRouter)
 app.use('/api/orders', orderRouter)
 app.use('/api/employees', employeeRouter)
+app.use('/api/tables', tableRouter)
 
 app.use(errorHandler)
 
