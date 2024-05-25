@@ -5,6 +5,7 @@ import { ValidationError } from '../errors/ValidationError'
 import { validate as isValidUUID } from 'uuid'
 import { Shift } from '../models/shiftModel'
 import { Waiter } from '../models/waiterModel'
+import { Item } from '../models/itemModel'
 
 export class OrderService {
     async getRestaurantOrderById(restaurantId: string, orderId: string) {
@@ -94,6 +95,16 @@ export class OrderService {
         return waiters[randomIndex]
     }
 
+    private calculateTotalPrice(
+        orderItems: { cijena: number; kolicina: number }[],
+    ) {
+        let totalPrice = 0
+        for (const item of orderItems) {
+            totalPrice += item.cijena * item.kolicina
+        }
+        return totalPrice
+    }
+
     async createOrder(restaurantId: string, order: OrderDTO) {
         await this.validate(order, restaurantId)
 
@@ -111,7 +122,7 @@ export class OrderService {
             const waiter = await this.getRandomWaiterByShift(restaurantId)
 
             const orderResults = await client.query(
-                'INSERT INTO narudzba (vrijeme, status, br_stol, id_objekt, id_konobar) VALUES ($1, $2, $3, $4, $5) RETURNING id_narudzba',
+                'INSERT INTO narudzba (vrijeme, status, br_stol, id_objekt, id_konobar) VALUES ($1, $2, $3, $4, $5) RETURNING *',
                 [
                     time.toISOString(),
                     status,
@@ -121,7 +132,9 @@ export class OrderService {
                 ],
             )
 
-            const orderId = orderResults.rows[0].id_narudzba
+            const createdOrder = orderResults.rows[0] as Order
+
+            const orderId = createdOrder.id_narudzba
 
             for (const item of order.items) {
                 await client.query(
@@ -131,8 +144,19 @@ export class OrderService {
             }
             await client.query('COMMIT')
 
-            const createdOrder = orderResults.rows[0] as Order
-            return createdOrder
+            const orderItemsResults = await client.query(
+                'SELECT stavka.id_stavka, naziv_stavka, kolicina, cijena FROM stavka NATURAL JOIN narudzba_stavka WHERE id_narudzba = $1',
+                [orderId],
+            )
+            const orderItems = orderItemsResults.rows as (Item & {
+                kolicina: number
+            })[]
+
+            return {
+                ...createdOrder,
+                stavke: orderItems,
+                ukupna_cijena: this.calculateTotalPrice(orderItems),
+            }
         } catch (error) {
             await client.query('ROLLBACK')
             throw error
