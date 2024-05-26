@@ -156,6 +156,15 @@ export class OrderService {
 
             const orderId = createdOrder.id_narudzba
 
+            setTimeout(async () => {
+                await db.query(
+                    'UPDATE narudzba SET status = $1 WHERE id_narudzba = $2',
+                    [Status[Status.U_TOKU], orderId],
+                )
+            }, 20_000)
+
+            await client.query('COMMIT')
+
             return orderId
         } catch (error) {
             await client.query('ROLLBACK')
