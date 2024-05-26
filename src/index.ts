@@ -5,6 +5,7 @@ import { itemRouter } from './routes/itemRoutes'
 import { restaurantRouter } from './routes/restaurantRoutes'
 import { errorHandler } from './middleware/errorHandler'
 import { orderRouter } from './routes/orderRoutes'
+import bodyParser from 'body-parser'
 import { tableRouter } from './routes/tableRoutes'
 
 dotenv.config()
@@ -16,6 +17,8 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
+
+app.use(bodyParser.json())
 
 app.use(express.json())
 
