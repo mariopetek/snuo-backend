@@ -1,5 +1,6 @@
 import app from '../index'
 import request from 'supertest'
+import { validate as isValidUUID } from 'uuid'
 
 describe('POST /api/orders/d0f5bcf9-30f8-4ec2-b4d5-9457cf08d80e', () => {
     it('should create a new order, return 200 OK with id_narudzba in the body', async () => {
@@ -22,7 +23,6 @@ describe('POST /api/orders/d0f5bcf9-30f8-4ec2-b4d5-9457cf08d80e', () => {
             .send(orderData)
             .expect(200)
 
-        expect(response.body).toHaveProperty('id_narudzba')
-        expect(response.body.id_narudzba).toBeDefined()
+        expect(isValidUUID(response.body)).toBe(true)
     })
 })
