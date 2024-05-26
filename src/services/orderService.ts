@@ -137,7 +137,7 @@ export class OrderService {
             const orderResults = await client.query(
                 'INSERT INTO narudzba (vrijeme, status, br_stol, id_objekt, id_konobar) VALUES ($1, $2, $3, $4, $5) RETURNING *',
                 [
-                    time.toISOString(),
+                    time.toUTCString(),
                     status,
                     order.br_stol,
                     restaurantId,
